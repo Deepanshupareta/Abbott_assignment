@@ -1,0 +1,60 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Description: CFT For lambda deployment and sthree
+
+Transform: 'AWS::Serverless-2016-10-31'
+
+Parameters:
+
+  BucketName:
+
+    Type: String
+
+    Default: assignment-lambda-code
+
+Resources:
+
+  samplelambdafn:
+
+    Type: "AWS::Lambda::Function"
+
+    Properties:
+
+      FunctionName: Input-S3-Bucket-Trigger-Function
+      Handler: index.lambda_handler
+      Role: !GetAtt lambdaRole.Arn
+      Runtime: python3.8
+      Timeout: 500
+      Code:
+        S3Bucket: !Sub ${BucketName}
+        S3Key: lambda.zip
+      Environment:
+        Variables:
+          CODE_LOCATION: !Sub ${BucketName}-scriptss/index.zip
+
+  lambdaRole:
+
+    Type: 'AWS::IAM::Role'
+
+    Properties:
+
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonS3FullAccess
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action:
+              - 'sts:AssumeRole'
+            Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+        Version: '2012-10-17'
+      Path: /
+
+  SthreeBucket:
+
+    Type: 'AWS::S3::Bucket'
+
+    Properties:
+
+      BucketName: cloud-formation-bucket-7611806270
